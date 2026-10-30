@@ -4,141 +4,138 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Інтерактивна дошка: Переклад з мови тривоги на мову рішень</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <style>
+    :root {
+      --sticker-green: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: radial-gradient(circle at 10% 20%, rgba(224, 231, 255, 0.7) 0%, rgba(243, 244, 246, 0.9) 90%);
       background-attachment: fixed;
     }
-    h1, h2, h3, h4, .font-heading {
-      font-family: 'Outfit', sans-serif;
-    }
+    h1, h2, h3, h4, .font-heading { font-family: 'Outfit', sans-serif; }
 
-    /* Sticker Flip & Reveal Effect */
-    .sticker-container {
-      perspective: 1000px;
-    }
+    .sticker-container { perspective: 1000px; }
     .sticker-cover {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 8px 20px -4px rgba(5, 150, 105, 0.35), inset 0 2px 4px rgba(255,255,255,0.3);
+      background: var(--sticker-green);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 20px -4px rgba(5, 150, 105, 0.35), inset 0 2px 4px rgba(255,255,255,0.25);
     }
     .sticker-cover:hover {
-      transform: translateY(-4px) rotate(-1deg) scale(1.02);
+      transform: translateY(-3px) rotate(-0.8deg) scale(1.015);
       box-shadow: 0 14px 28px -6px rgba(5, 150, 105, 0.45);
     }
-    
+    .sticker-cover:active { transform: scale(0.98); }
+
     .revealed-box {
-      animation: flipIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation: flipIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-
     @keyframes flipIn {
-      0% {
-        opacity: 0;
-        transform: rotateX(-25deg) scale(0.96);
-      }
-      100% {
-        opacity: 1;
-        transform: rotateX(0deg) scale(1);
-      }
+      0% { opacity: 0; transform: rotateX(-18deg) scale(0.97); }
+      100% { opacity: 1; transform: rotateX(0) scale(1); }
     }
 
-    /* Pulse & Hover effects for emoji visual anchors */
     .emoji-anchor {
       display: inline-block;
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .emoji-anchor:hover {
-      transform: scale(1.3) rotate(10deg);
+    .emoji-anchor:hover { transform: scale(1.25) rotate(8deg); }
+
+    mark.search-hit {
+      background: linear-gradient(120deg, #fef08a 0%, #fde047 100%);
+      color: inherit;
+      padding: 0 2px;
+      border-radius: 3px;
+      box-decoration-break: clone;
     }
 
-    /* Hide print elements during regular viewing */
+    /* Mobile card view */
+    @media (max-width: 900px) {
+      .desktop-table { display: none !important; }
+      .mobile-cards { display: block !important; }
+    }
+    @media (min-width: 901px) {
+      .desktop-table { display: block; }
+      .mobile-cards { display: none !important; }
+    }
+
     @media print {
-      body {
-        background: white !important;
-        color: black !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-only {
-        display: block !important;
-      }
-      .sticker-cover {
-        display: none !important;
-      }
-      .revealed-box-print {
-        display: block !important;
-        opacity: 1 !important;
-      }
-      .bg-white\/90, .bg-white\/80 {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      .sticker-cover { display: none !important; }
+      .revealed-box-print { display: block !important; opacity: 1 !important; }
+      .bg-white\/90, .bg-white\/80, .bg-rose-50\/30, .bg-amber-50\/30, .bg-emerald-50\/20, .bg-teal-50\/20 {
         background: white !important;
         box-shadow: none !important;
-        border: 1px solid #ccc !important;
+        border: 1px solid #ddd !important;
       }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .modal-enter { animation: modalIn 0.25s ease-out; }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+
+    .case-card {
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 6px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+    .case-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
     }
   </style>
 </head>
-<body class="text-slate-800 min-h-screen pb-16 selection:bg-indigo-500 selection:text-white">
+<body class="text-slate-800 min-h-screen pb-20 selection:bg-indigo-500 selection:text-white">
 
-  <!-- Main Container -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
-    
-    <!-- Top Hero Header -->
-    <header class="no-print relative bg-white/85 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 border border-white/80 mb-8 overflow-hidden">
-      <!-- Background blur decorations -->
-      <div class="absolute -top-12 -right-12 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-12 -left-12 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8">
 
-      <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs font-bold tracking-wide shadow-md shadow-indigo-500/20 mb-3">
-            <span class="text-sm">🎯</span> Інтерактивний тренажер профорієнтації & діалогу з батьками
+    <!-- Header -->
+    <header class="no-print relative bg-white/85 backdrop-blur-md rounded-3xl p-5 sm:p-7 shadow-xl shadow-slate-200/50 border border-white/80 mb-6 overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-56 h-56 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-56 h-56 bg-indigo-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div class="min-w-0">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-[11px] font-bold tracking-wide shadow-md shadow-indigo-500/20 mb-2.5">
+            <span>🎯</span> Інтерактивний тренажер профорієнтації & діалогу з батьками
           </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Переклад з «мови тривоги» <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-emerald-600 to-teal-600">на «мову рішень»</span>
           </h1>
-          <p class="mt-3 text-slate-600 max-w-3xl text-sm sm:text-base leading-relaxed">
-            «Колеги, перед вами фрази-стереотипи, за якими ховається реальний страх батьків за майбутнє дитини. Наше завдання як фасилітаторів — зняти емоційну напругу, перекласти „мову тривоги“ на „мову рішень“ та запропонувати конкретний інструмент з нашого шкільного досвіду».
+          <p class="mt-2.5 text-slate-600 max-w-3xl text-sm leading-relaxed">
+            Фрази-стереотипи, за якими ховається страх батьків за майбутнє дитини. Завдання фасилітатора — зняти напругу, перекласти «мову тривоги» на «мову рішень» і запропонувати конкретний інструмент.
           </p>
         </div>
 
-        <!-- Header Interactive Actions -->
-        <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
-          <button onclick="openGalleryModal()" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-500/25 transition-all transform active:scale-95 text-xs sm:text-sm">
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button onclick="openGalleryModal()" class="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95 text-xs">
             <i class="fa-solid fa-camera-retro text-indigo-200"></i>
-            <span>📸 30-сек Галерея</span>
-          </button>
-          
-          <button onclick="toggleAllStickers()" id="globalRevealBtn" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl shadow-lg shadow-slate-900/20 transition-all transform active:scale-95 text-xs sm:text-sm">
-            <i class="fa-solid fa-eye" id="globalRevealIcon"></i>
-            <span id="globalRevealText">Відкрити всі рішення</span>
+            <span>📸 Галерея</span>
           </button>
 
-          <button onclick="window.print()" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl border border-slate-300 transition-all text-xs sm:text-sm" title="Друк пам'ятки">
+          <button onclick="toggleAllStickers()" id="globalRevealBtn" class="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-lg shadow-slate-900/15 transition-all active:scale-95 text-xs">
+            <i class="fa-solid fa-eye" id="globalRevealIcon"></i>
+            <span id="globalRevealText">Відкрити всі</span>
+          </button>
+
+          <button onclick="exportCases()" class="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl border border-slate-200 transition-all text-xs" title="Експорт JSON">
+            <i class="fa-solid fa-download"></i>
+            <span class="hidden sm:inline">Експорт</span>
+          </button>
+
+          <button onclick="window.print()" class="flex items-center justify-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl border border-slate-200 transition-all text-xs" title="Друк">
             <i class="fa-solid fa-print"></i>
             <span class="hidden sm:inline">Друк</span>
           </button>
@@ -146,249 +143,186 @@
       </div>
     </header>
 
-    <!-- Search & Filter Bar -->
-    <div class="no-print bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-slate-200/80 mb-6 space-y-4">
-      
-      <!-- Top Row: Search & Add Button -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="relative w-full sm:w-80">
+    <!-- Search & Filters -->
+    <div class="no-print bg-white/80 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-200/80 mb-5 space-y-3">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="relative flex-1 max-w-md">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="searchInput" oninput="filterCases()" placeholder="Пошук стереотипу або професії..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+          <input type="text" id="searchInput" oninput="filterCases()" placeholder="Пошук стереотипу, страху чи інструменту..." class="w-full pl-9 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+          <button id="clearSearch" onclick="clearSearch()" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200 hidden items-center justify-center text-xs">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
-        <button onclick="openAddModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95">
-          <i class="fa-solid fa-plus-circle text-emerald-200"></i>
-          <span>➕ Додати новий стереотип</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <span id="casesCounter" class="text-xs font-medium text-slate-500 px-2.5 py-1.5 bg-slate-100 rounded-lg whitespace-nowrap"></span>
+          <button onclick="openAddModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-95 whitespace-nowrap">
+            <i class="fa-solid fa-plus"></i>
+            <span>Додати кейс</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 pt-1" id="categoryFilters">
-        <!-- Rendered dynamically -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-0.5 -mx-0.5 px-0.5" id="categoryFilters"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="no-print bg-white/60 backdrop-blur-sm rounded-2xl p-3 shadow-sm border border-slate-200/60 mb-5 flex flex-wrap items-center gap-2 text-xs">
+      <span class="font-bold text-slate-500 uppercase tracking-wider text-[10px] mr-1">Якіри:</span>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200/80">
+        <span class="emoji-anchor">🛑</span> Мова тривоги
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/80">
+        <span class="emoji-anchor">🔍</span> Корінь страху
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+        <span class="emoji-anchor">💡</span> Мова рішень
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200/80">
+        <span class="emoji-anchor">🔑</span> Інструмент
       </div>
     </div>
 
-    <!-- Visual Anchors Legend -->
-    <div class="no-print bg-white/60 backdrop-blur-sm rounded-2xl p-3.5 shadow-sm border border-slate-200/60 mb-6 flex flex-wrap items-center justify-between gap-3 text-xs">
-      <div class="flex items-center gap-1.5 font-bold text-slate-500 uppercase tracking-wider text-[11px]">
-        <span>Візуальні якіри:</span>
-      </div>
-      
-      <div class="flex flex-wrap items-center gap-2 font-medium">
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 shadow-sm">
-          <span class="emoji-anchor">🛑</span>
-          <span>🚨 1. Мова тривоги (Стереотип)</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
-          <span class="emoji-anchor">🔍</span>
-          <span>🧐 2. Корінь страху</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-sm">
-          <span class="emoji-anchor">💡</span>
-          <span>✨ 3. Мова рішень</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-teal-50 text-teal-800 border border-teal-200 shadow-sm">
-          <span class="emoji-anchor">🔑</span>
-          <span>🛠️ 4. Інструмент закладу</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Table Container -->
-    <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden mb-8">
+    <!-- Desktop Table -->
+    <div class="desktop-table bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden mb-6">
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[980px]">
+        <table class="w-full text-left border-collapse min-w-[960px]">
           <thead>
             <tr class="bg-slate-900 text-white text-xs font-bold uppercase tracking-wider">
-              
-              <!-- Col 1 Header -->
-              <th class="p-5 w-1/4 border-r border-slate-800 bg-gradient-to-br from-rose-950/90 to-slate-900">
-                <div class="flex items-center gap-2.5">
-                  <span class="emoji-anchor text-xl">🛑</span>
+              <th class="p-4 w-1/4 border-r border-slate-800 bg-gradient-to-br from-rose-950/90 to-slate-900">
+                <div class="flex items-center gap-2">
+                  <span class="emoji-anchor text-lg">🛑</span>
                   <div>
-                    <div class="text-rose-400 font-extrabold text-sm flex items-center gap-1">
-                      Мова тривоги батьків 🚨
-                    </div>
-                    <div class="text-[10px] text-slate-400 font-normal lowercase tracking-normal">(фраза-стереотип)</div>
+                    <div class="text-rose-400 font-extrabold text-sm">Мова тривоги 🚨</div>
+                    <div class="text-[10px] text-slate-400 font-normal normal-case tracking-normal">фраза-стереотип</div>
                   </div>
                 </div>
               </th>
-
-              <!-- Col 2 Header -->
-              <th class="p-5 w-1/4 border-r border-slate-800 bg-gradient-to-br from-amber-950/90 to-slate-900">
-                <div class="flex items-center gap-2.5">
-                  <span class="emoji-anchor text-xl">🔍</span>
+              <th class="p-4 w-1/4 border-r border-slate-800 bg-gradient-to-br from-amber-950/90 to-slate-900">
+                <div class="flex items-center gap-2">
+                  <span class="emoji-anchor text-lg">🔍</span>
                   <div>
-                    <div class="text-amber-400 font-extrabold text-sm">
-                      Що насправді ховається? 🧐
-                    </div>
-                    <div class="text-[10px] text-slate-400 font-normal lowercase tracking-normal">(корінь страху)</div>
+                    <div class="text-amber-400 font-extrabold text-sm">Корінь страху 🧐</div>
+                    <div class="text-[10px] text-slate-400 font-normal normal-case tracking-normal">що ховається</div>
                   </div>
                 </div>
               </th>
-
-              <!-- Col 3 Header -->
-              <th class="p-5 w-1/4 border-r border-slate-800 bg-gradient-to-br from-emerald-950/90 to-slate-900">
-                <div class="flex items-center gap-2.5">
-                  <span class="emoji-anchor text-xl">💡</span>
+              <th class="p-4 w-1/4 border-r border-slate-800 bg-gradient-to-br from-emerald-950/90 to-slate-900">
+                <div class="flex items-center gap-2">
+                  <span class="emoji-anchor text-lg">💡</span>
                   <div>
-                    <div class="text-emerald-400 font-extrabold text-sm">
-                      Мова рішень педагога ✨
-                    </div>
-                    <div class="text-[10px] text-slate-400 font-normal lowercase tracking-normal">(фасилітативна відповідь)</div>
+                    <div class="text-emerald-400 font-extrabold text-sm">Мова рішень ✨</div>
+                    <div class="text-[10px] text-slate-400 font-normal normal-case tracking-normal">фасилітативна відповідь</div>
                   </div>
                 </div>
               </th>
-
-              <!-- Col 4 Header -->
-              <th class="p-5 w-1/4 bg-gradient-to-br from-teal-950/90 to-slate-900">
-                <div class="flex items-center gap-2.5">
-                  <span class="emoji-anchor text-xl">🔑</span>
+              <th class="p-4 w-1/4 bg-gradient-to-br from-teal-950/90 to-slate-900">
+                <div class="flex items-center gap-2">
+                  <span class="emoji-anchor text-lg">🔑</span>
                   <div>
-                    <div class="text-teal-400 font-extrabold text-sm">
-                      Інструмент закладу 🛠️
-                    </div>
-                    <div class="text-[10px] text-slate-400 font-normal lowercase tracking-normal">(з власного досвіду)</div>
+                    <div class="text-teal-400 font-extrabold text-sm">Інструмент 🛠️</div>
+                    <div class="text-[10px] text-slate-400 font-normal normal-case tracking-normal">з досвіду закладу</div>
                   </div>
                 </div>
               </th>
-
             </tr>
           </thead>
-          <tbody id="casesTableBody" class="divide-y divide-slate-200/80">
-            <!-- Dynamic Rows Injected via JavaScript -->
-          </tbody>
+          <tbody id="casesTableBody" class="divide-y divide-slate-200/70"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Methodology & Visual Tips Panel -->
-    <div class="no-print grid grid-cols-1 md:grid-cols-3 gap-5">
-      
-      <!-- Tip 1 -->
-      <div class="p-5 rounded-2xl bg-white/80 border border-slate-200/80 shadow-md flex items-start gap-4 hover:shadow-lg transition-shadow">
-        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-bold text-lg">
-          🪄
-        </div>
+    <!-- Mobile Cards -->
+    <div class="mobile-cards space-y-4 mb-6" id="mobileCards"></div>
+
+    <!-- Tips -->
+    <div class="no-print grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-4 rounded-2xl bg-white/80 border border-slate-200/80 shadow-sm flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 text-base">🪄</div>
         <div>
-          <h4 class="font-bold text-slate-900 text-sm mb-1">1. Інтерактивні шторки</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Стовпчики «Мова рішень» та «Інструмент закладу» приховані цифровими стікерами. Натискайте на стікер для легкого відкриття готового рішення під час обговорення.
-          </p>
+          <h4 class="font-bold text-slate-900 text-sm mb-0.5">Інтерактивні шторки</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">Натискайте на зелені стікери, щоб відкрити рішення під час обговорення. Дані зберігаються автоматично.</p>
         </div>
       </div>
-
-      <!-- Tip 2 -->
-      <div class="p-5 rounded-2xl bg-white/80 border border-slate-200/80 shadow-md flex items-start gap-4 hover:shadow-lg transition-shadow">
-        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 font-bold text-lg">
-          📸
-        </div>
+      <div class="p-4 rounded-2xl bg-white/80 border border-slate-200/80 shadow-sm flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 text-base">📸</div>
         <div>
-          <h4 class="font-bold text-slate-900 text-sm mb-1">2. Медіа-галерея (30 сек)</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Клікабельна зона поруч з таблицею відкриває галерею реальних шкільних екскурсій на підприємства для наочної демонстрації інструменту в дії.
-          </p>
+          <h4 class="font-bold text-slate-900 text-sm mb-0.5">Галерея екскурсій</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">Реальні приклади спільних візитів «дитина + батько» на сучасні підприємства та лабораторії.</p>
         </div>
       </div>
-
-      <!-- Tip 3 -->
-      <div class="p-5 rounded-2xl bg-white/80 border border-slate-200/80 shadow-md flex items-start gap-4 hover:shadow-lg transition-shadow">
-        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-lg">
-          📌
-        </div>
+      <div class="p-4 rounded-2xl bg-white/80 border border-slate-200/80 shadow-sm flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 text-base">📌</div>
         <div>
-          <h4 class="font-bold text-slate-900 text-sm mb-1">3. Адаптація під ваш регіон</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Коригуйте формулювання кейсів або додавайте нові стереотипи з різних категорій, які є найбільш актуальними для вашої громади та школи.
-          </p>
+          <h4 class="font-bold text-slate-900 text-sm mb-0.5">Адаптація під регіон</h4>
+          <p class="text-xs text-slate-600 leading-relaxed">Додавайте, редагуйте та видаляйте кейси. Експортуйте JSON для обміну з колегами.</p>
         </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- Modal: 30-Second Excursion Media Gallery -->
-  <div id="galleryModal" class="no-print fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-white/20 transform transition-all">
-      
-      <!-- Modal Header -->
-      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🚌</span>
-          <div>
-            <h3 class="font-extrabold text-base">Галерея екскурсій «Дитина + Батько»</h3>
-            <p class="text-xs text-slate-400">Наочна демонстрація інструменту в дії</p>
-          </div>
-        </div>
-        <button onclick="closeGalleryModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      
-      <!-- Modal Body -->
-      <div class="p-6">
-        <!-- Interactive Slide Container -->
-        <div class="relative bg-slate-950 rounded-2xl overflow-hidden aspect-video shadow-inner group">
-          <img id="galleryImage" src="" alt="Екскурсія" class="w-full h-full object-cover transition-all duration-500">
-          
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent p-6 flex flex-col justify-end">
-            <span id="galleryBadge" class="self-start px-3 py-1 rounded-full bg-indigo-600/90 text-white text-[11px] font-bold uppercase tracking-wider mb-2 backdrop-blur-md border border-indigo-400/30"></span>
-            <h4 id="galleryTitle" class="font-bold text-lg sm:text-xl text-white mb-1"></h4>
-            <p id="galleryDesc" class="text-xs sm:text-sm text-slate-300 line-clamp-2 leading-relaxed"></p>
-          </div>
-
-          <!-- Slide Controls -->
-          <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg transition-all active:scale-90">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg transition-all active:scale-90">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
-
-        <!-- Dots & Navigation Bar -->
-        <div class="flex items-center justify-between mt-5">
-          <div class="flex items-center gap-2" id="galleryDots"></div>
-          <span class="text-xs font-mono font-bold text-slate-500 px-3 py-1 bg-slate-100 rounded-lg" id="galleryCounter">1 / 3</span>
-        </div>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
-        <span class="text-xs text-slate-500 italic">💡 Використовуйте стрілки клавіатури для гортання</span>
-        <button onclick="closeGalleryModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-colors">
-          Закрити
-        </button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Add or Edit Case -->
-  <div id="caseModal" class="no-print fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-white/20">
-      
-      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+  <!-- Gallery Modal -->
+  <div id="galleryModal" class="no-print fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl modal-enter">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <span class="text-xl">✏️</span>
-          <h3 class="font-bold text-base" id="caseModalTitle">Редагування кейсу</h3>
+          <span class="text-xl">🚌</span>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Галерея екскурсій «Дитина + Батько»</h3>
+            <p class="text-[11px] text-slate-400">Наочна демонстрація інструменту</p>
+          </div>
         </div>
-        <button onclick="closeCaseModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
+        <button onclick="closeGalleryModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center" aria-label="Закрити">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form id="caseForm" onsubmit="saveCase(event)" class="p-6 space-y-4">
+      <div class="p-4 sm:p-5">
+        <div class="relative bg-slate-950 rounded-xl overflow-hidden aspect-video shadow-inner">
+          <img id="galleryImage" src="" alt="Екскурсія" class="w-full h-full object-cover transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent p-4 sm:p-5 flex flex-col justify-end">
+            <span id="galleryBadge" class="self-start px-2.5 py-0.5 rounded-full bg-indigo-600/90 text-white text-[10px] font-bold uppercase tracking-wider mb-1.5 backdrop-blur-md"></span>
+            <h4 id="galleryTitle" class="font-bold text-base sm:text-lg text-white mb-0.5"></h4>
+            <p id="galleryDesc" class="text-xs text-slate-300 line-clamp-2 leading-relaxed"></p>
+          </div>
+          <button onclick="prevSlide()" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg active:scale-90" aria-label="Попереднє">
+            <i class="fa-solid fa-chevron-left text-sm"></i>
+          </button>
+          <button onclick="nextSlide()" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 hover:bg-white text-slate-900 flex items-center justify-center shadow-lg active:scale-90" aria-label="Наступне">
+            <i class="fa-solid fa-chevron-right text-sm"></i>
+          </button>
+        </div>
+        <div class="flex items-center justify-between mt-4">
+          <div class="flex items-center gap-1.5" id="galleryDots"></div>
+          <span class="text-xs font-mono font-bold text-slate-500 px-2.5 py-1 bg-slate-100 rounded-lg" id="galleryCounter">1 / 3</span>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500 italic hidden sm:inline">← → стрілки клавіатури · Esc — закрити</span>
+        <button onclick="closeGalleryModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl">Закрити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case Modal -->
+  <div id="caseModal" class="no-print fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto modal-enter">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">✏️</span>
+          <h3 class="font-bold text-sm sm:text-base" id="caseModalTitle">Редагування кейсу</h3>
+        </div>
+        <button onclick="closeCaseModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center" aria-label="Закрити">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="caseForm" onsubmit="saveCase(event)" class="p-5 space-y-3.5">
         <input type="hidden" id="caseId">
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
-            Категорія напряму
-          </label>
-          <select id="fieldCategory" class="w-full text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white">
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Категорія</label>
+          <select id="fieldCategory" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
             <option value="art">🎨 Творчість та дизайн</option>
             <option value="pto">🏭 ПТО / Виробництво</option>
             <option value="gender">⚙️ Гендерні стереотипи</option>
@@ -400,48 +334,39 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-rose-700 uppercase mb-1">
-            🛑 Мова тривоги батьків (Стереотип)
-          </label>
-          <textarea id="fieldAnxiety" required rows="2" class="w-full text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none" placeholder="«Який ще художній коледж? Ти там з голоду помреш...»"></textarea>
+          <label class="block text-[11px] font-bold text-rose-700 uppercase mb-1">🛑 Мова тривоги (стереотип)</label>
+          <textarea id="fieldAnxiety" required rows="2" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="«Який ще художній коледж? Ти там з голоду помреш...»"></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-amber-700 uppercase mb-1">
-            🔍 Що насправді ховається? (Корінь страху)
-          </label>
-          <textarea id="fieldFear" required rows="2" class="w-full text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="Страх фінансової нестабільності та бідності дитини."></textarea>
+          <label class="block text-[11px] font-bold text-amber-700 uppercase mb-1">🔍 Корінь страху</label>
+          <textarea id="fieldFear" required rows="2" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Страх фінансової нестабільності..."></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-emerald-700 uppercase mb-1">
-            💡 Мова рішень педагога (Відповідь)
-          </label>
-          <textarea id="fieldSolution" required rows="3" class="w-full text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="«Ви прагнете, щоб дитина мала гарантований дохід...»"></textarea>
+          <label class="block text-[11px] font-bold text-emerald-700 uppercase mb-1">💡 Мова рішень педагога</label>
+          <textarea id="fieldSolution" required rows="3" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="«Ви прагнете, щоб дитина мала гарантований дохід...»"></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-teal-700 uppercase mb-1">
-            🔑 Інструмент закладу (З власного досвіду)
-          </label>
-          <textarea id="fieldTool" required rows="2" class="w-full text-sm p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none" placeholder="Матриця альтернатив: Спільний розбір із психологом..."></textarea>
+          <label class="block text-[11px] font-bold text-teal-700 uppercase mb-1">🔑 Інструмент закладу</label>
+          <textarea id="fieldTool" required rows="2" class="w-full text-sm p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none" placeholder="Матриця альтернатив, екскурсія..."></textarea>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button type="button" onclick="closeCaseModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors">
-            Скасувати
-          </button>
-          <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors">
-            Зберегти кейс
-          </button>
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeCaseModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Скасувати</button>
+          <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md">Зберегти</button>
         </div>
       </form>
-
     </div>
   </div>
 
+  <!-- Toast -->
+  <div id="toast" class="no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-xl shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2"></div>
+
   <script>
-    // Category Definitions
+    const STORAGE_KEY = 'anxiety_to_solution_cases_v2';
+
     const categories = {
       all: { name: 'Всі напрями', icon: '🌟' },
       art: { name: '🎨 Творчість', icon: '🎨' },
@@ -449,19 +374,18 @@
       gender: { name: '⚙️ Гендерні', icon: '⚙️' },
       it: { name: '💻 IT & Кібер', icon: '💻' },
       agro: { name: '🌾 Агро & Біо', icon: '🌾' },
-      services: { name: '👨‍🍳 Послуги & Кулінарія', icon: '👨‍🍳' },
+      services: { name: '👨‍🍳 Послуги', icon: '👨‍🍳' },
       humanities: { name: '📚 Медіа & AI', icon: '📚' }
     };
 
-    // Expanded Dataset covering all core categories
-    let initialCases = [
+    const defaultCases = [
       {
         id: 'case-art',
         category: 'art',
         anxiety: '«Який ще художній коледж? Ти там з голоду помреш! Тобі потрібна нормальна стабільна професія, як-от бухгалтер!»',
         fear: 'Страх фінансової нестабільності та відсутності затребуваності дитини у майбутньому.',
-        solution: '«Ви прагнете, щоб дитина мала гарантований дохід. Світ змінився: художні навички сьогодні — це основа цифрового дизайну, де доходи часто вищі, ніж у класичній бухгалтерії. Давайте подивимось на суміжні сфери».',
-        tool: 'Матриця альтернатив: Спільний розбір із психологом сучасних професій на стику мистецтва та технологій (UI/UX-дизайн, геймдев, 3D-моделювання, motion-дизайн).',
+        solution: '«Ви прагнете, щоб дитина мала гарантований дохід. Світ змінився: художні навички сьогодні — основа цифрового дизайну, де доходи часто вищі, ніж у класичній бухгалтерії. Давайте подивимось на суміжні сфери».',
+        tool: 'Матриця альтернатив: спільний розбір із психологом сучасних професій на стику мистецтва та технологій (UI/UX, геймдев, 3D-моделювання, motion-дизайн).',
         revealedSolution: false,
         revealedTool: false
       },
@@ -470,8 +394,8 @@
         category: 'pto',
         anxiety: '«Навіщо йти на цей завод чи в ПТУ? Там бруд, застаріле обладнання і немає жодних перспектив!»',
         fear: 'Страх низького соціального статусу та важкої фізичної праці.',
-        solution: '«Я розумію ваше ставлення, засноване на минулому досвіді. Проте сучасне виробництво — це автоматизація, програмування та робототехніка, де потрібні високі інтелектуальні навички».',
-        tool: 'Інтегрована екскурсія «Дитина + Батько»: Спільний візит на сучасне роботизоване підприємство-партнер, щоб на власні очі побачити цифровізовані робочі місця.',
+        solution: '«Я розумію ваше ставлення, засноване на минулому досвіді. Сучасне виробництво — це автоматизація, програмування та робототехніка, де потрібні високі інтелектуальні навички».',
+        tool: 'Інтегрована екскурсія «Дитина + Батько»: спільний візит на сучасне роботизоване підприємство-партнер, щоб побачити цифровізовані робочі місця.',
         revealedSolution: false,
         revealedTool: false
       },
@@ -480,8 +404,8 @@
         category: 'gender',
         anxiety: '«Вона ж дівчинка! Яка логістика чи автосправа? Це не жіноча робота, їй буде занадто важко!»',
         fear: 'Страх невідповідності гендерним ролям, занепокоєння про фізичне навантаження та безпеку.',
-        solution: '«Ви хвилюєтеся про безпеку та комфорт вашої доньки. Сучасна логістика та автосервіс — це передусім керування процесами, аналітика та програмне забезпечення, де гендер не має значення».',
-        tool: 'Зустрічі «Професії моїх батьків»: Запрошення мами-логістки чи жінки-інженерки, яка ділиться реальним досвідом успіху у цій сфері («Рівний рівному»).',
+        solution: '«Ви хвилюєтеся про безпеку та комфорт вашої доньки. Сучасна логістика та автосервіс — це передусім керування процесами, аналітика та ПЗ, де гендер не має значення».',
+        tool: 'Зустрічі «Професії моїх батьків»: запрошення мами-логістки чи жінки-інженерки, яка ділиться реальним досвідом («Рівний рівному»).',
         revealedSolution: false,
         revealedTool: false
       },
@@ -490,8 +414,8 @@
         category: 'it',
         anxiety: '«Син тільки в комп’ютері сидить цілими днями! Це марнування життя, треба шукати нормальну роботу в офісі!»',
         fear: 'Страх комп’ютерної залежності, ізоляції дитини та відсутності реальної кар’єри.',
-        solution: '«Розумію ваше занепокоєння щодо екранного часу. Проте інтерес до комп’ютерів можна перетворити з пасивного споживання на високооплачувану професію розробника, аналітика чи спеціаліста з кібербезпеки».',
-        tool: 'Шкільний Хакатон / Гурток робототехніки: Перенаправлення ігрового інтересу у створення власних проєктів, код та командну розробку.',
+        solution: '«Розумію ваше занепокоєння щодо екранного часу. Інтерес до комп’ютерів можна перетворити з пасивного споживання на високооплачувану професію розробника, аналітика чи спеціаліста з кібербезпеки».',
+        tool: 'Шкільний хакатон / гурток робототехніки: перенаправлення ігрового інтересу у створення власних проєктів, код і командну розробку.',
         revealedSolution: false,
         revealedTool: false
       },
@@ -500,8 +424,8 @@
         category: 'agro',
         anxiety: '«У село на трактор зібрався? Там тільки бруд, важка лопата і відсутність будь-якої цивілізації!»',
         fear: 'Страх безперспективності сільського життя, низького рівня комфорту та важкої праці.',
-        solution: '«Ви прагнете для дитини сучасних умов життя. Сучасний агросектор — це агродрони, точне землеробство, супутникові GPS-системи та високі технології з конкурентними зарплатами».',
-        tool: 'Проєкт «Smart-ферма»: Моделювання технологічних процесів у сучасній агрономії та візити на агро-технологічні комплекси регіону.',
+        solution: '«Ви прагнете для дитини сучасних умов життя. Сучасний агросектор — це агродрони, точне землеробство, GPS-системи та високі технології з конкурентними зарплатами».',
+        tool: 'Проєкт «Smart-ферма»: моделювання технологічних процесів у сучасній агрономії та візити на агро-технологічні комплекси регіону.',
         revealedSolution: false,
         revealedTool: false
       },
@@ -511,7 +435,7 @@
         anxiety: '«Кухар чи перукар? Це робота для невдах! Тобі обов’язково потрібна вища освіта, щоб працювати в кабінеті!»',
         fear: 'Страх низького соціального статусу та відсутності диплому вищої освіти.',
         solution: '«Ви хочете, щоб дитина мала повагу у суспільстві. Сучасна кулінарія та б’юті-сфера — це власні бізнес-студії, ресторанний менеджмент, нутриціологія та особистий бренд».',
-        tool: 'Шкільний Бізнес-інкубатор: Майстер-класи з успішними шеф-кухарями та підприємцями, розрахунок першого бізнес-плану.',
+        tool: 'Шкільний бізнес-інкубатор: майстер-класи з успішними шеф-кухарями та підприємцями, розрахунок першого бізнес-плану.',
         revealedSolution: false,
         revealedTool: false
       },
@@ -520,14 +444,13 @@
         category: 'humanities',
         anxiety: '«Журналіст чи філолог? Зараз усе пише штучний інтелект, будеш сидіти без роботи і без грошей!»',
         fear: 'Страх втрати актуальності професії в еру розвитку штучного інтелекту.',
-        solution: '«Ви переживаєте за стабільність у часи технологічних змін. Штучний інтелект — це інструмент, але критичне мислення, емпатія, медіаграмотність та сторітелінг залишаються суто людськими перевагами».',
-        tool: 'Шкільний медіа-центр та подкаст-студія: Навчання створенню унікального якісного контенту із застосуванням AI-інструментів для підсилення результату.',
+        solution: '«Ви переживаєте за стабільність у часи технологічних змін. ШІ — це інструмент, але критичне мислення, емпатія, медіаграмотність і сторітелінг залишаються суто людськими перевагами».',
+        tool: 'Шкільний медіа-центр і подкаст-студія: навчання створенню якісного контенту із застосуванням AI-інструментів для підсилення результату.',
         revealedSolution: false,
         revealedTool: false
       }
     ];
 
-    // Gallery Slides Data
     const galleryItems = [
       {
         badge: '🤖 Автоматизовані цехи',
@@ -544,7 +467,7 @@
       {
         badge: '🌾 Агро-Технології',
         title: 'Демонстрація агродронів та Smart-полів',
-        desc: 'Ознайомлення учнів та батьків із картуванням ґрунтів та дистанційним керуванням агротехнікою.',
+        desc: 'Ознайомлення учнів і батьків із картуванням ґрунтів та дистанційним керуванням агротехнікою.',
         img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1000&q=80'
       }
     ];
@@ -552,209 +475,338 @@
     let currentSlide = 0;
     let selectedCategory = 'all';
     let searchQuery = '';
-    let cases = [...initialCases];
+    let cases = [];
 
-    // Render Category Filter Buttons
+    function loadCases() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) {
+            cases = parsed;
+            return;
+          }
+        }
+      } catch (e) {}
+      cases = JSON.parse(JSON.stringify(defaultCases));
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+      el.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+        el.classList.remove('opacity-100', 'translate-y-0');
+      }, 2200);
+    }
+
+    function highlight(text, query) {
+      if (!query || query.length < 2) return escapeHtml(text);
+      const escaped = escapeHtml(text);
+      const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      return escaped.replace(re, '<mark class="search-hit">$1</mark>');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getFiltered() {
+      return cases.filter(item => {
+        const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+        if (!matchesCategory) return false;
+        if (!searchQuery) return true;
+        const q = searchQuery;
+        return [item.anxiety, item.fear, item.solution, item.tool].some(t => t.toLowerCase().includes(q));
+      });
+    }
+
     function renderCategoryFilters() {
       const container = document.getElementById('categoryFilters');
       container.innerHTML = '';
-
       Object.keys(categories).forEach(catKey => {
         const cat = categories[catKey];
         const isActive = selectedCategory === catKey;
-        
         const btn = document.createElement('button');
         btn.onclick = () => {
           selectedCategory = catKey;
           renderCategoryFilters();
           filterCases();
         };
-
-        btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-          isActive 
-            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-105' 
+        btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+          isActive
+            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
             : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
         }`;
-        btn.textContent = `${cat.name}`;
+        btn.textContent = cat.name;
         container.appendChild(btn);
       });
     }
 
-    // Filter Cases by Category & Search
     function filterCases() {
       const input = document.getElementById('searchInput');
-      searchQuery = input ? input.value.toLowerCase() : '';
-
-      renderTable();
+      searchQuery = (input?.value || '').toLowerCase().trim();
+      const clearBtn = document.getElementById('clearSearch');
+      if (searchQuery) {
+        clearBtn.classList.remove('hidden');
+        clearBtn.classList.add('flex');
+      } else {
+        clearBtn.classList.add('hidden');
+        clearBtn.classList.remove('flex');
+      }
+      renderAll();
     }
 
-    // Render Table Body
-    function renderTable() {
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      filterCases();
+    }
+
+    function renderAll() {
+      const filtered = getFiltered();
+      const counter = document.getElementById('casesCounter');
+      counter.textContent = filtered.length === cases.length
+        ? `${cases.length} кейсів`
+        : `${filtered.length} з ${cases.length}`;
+
+      renderDesktopTable(filtered);
+      renderMobileCards(filtered);
+      updateGlobalBtn();
+    }
+
+    function renderDesktopTable(filtered) {
       const tbody = document.getElementById('casesTableBody');
       tbody.innerHTML = '';
 
-      const filteredCases = cases.filter(item => {
-        const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-        const matchesSearch = item.anxiety.toLowerCase().includes(searchQuery) ||
-                              item.fear.toLowerCase().includes(searchQuery) ||
-                              item.solution.toLowerCase().includes(searchQuery) ||
-                              item.tool.toLowerCase().includes(searchQuery);
-        return matchesCategory && matchesSearch;
-      });
-
-      if (filteredCases.length === 0) {
+      if (!filtered.length) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="4" class="p-8 text-center text-slate-500 italic text-sm">
-              🔍 За вашим запитом кейсів не знайдено. Спробуйте змінити фільтр або додайте новий стереотип.
+            <td colspan="4" class="p-10 text-center text-slate-500 text-sm">
+              <div class="text-3xl mb-2">🔍</div>
+              За вашим запитом кейсів не знайдено.<br>
+              <span class="text-xs">Змініть фільтр або додайте новий стереотип.</span>
             </td>
-          </tr>
-        `;
+          </tr>`;
         return;
       }
 
-      filteredCases.forEach((item, index) => {
+      filtered.forEach((item, index) => {
         const catObj = categories[item.category] || { name: 'Загальне', icon: '📌' };
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/70 transition-colors border-b border-slate-200/80 last:border-none group";
+        tr.className = 'hover:bg-slate-50/60 transition-colors border-b border-slate-200/70 last:border-none group';
 
         tr.innerHTML = `
-          <!-- Column 1: Anxiety (Red Visual Anchor) -->
-          <td class="p-5 align-top border-r border-slate-200/80 bg-rose-50/30">
-            <div class="flex items-start justify-between gap-3">
-              <div class="space-y-2">
+          <td class="p-4 align-top border-r border-slate-200/70 bg-rose-50/25">
+            <div class="flex items-start justify-between gap-2">
+              <div class="space-y-1.5 min-w-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold uppercase tracking-wider">
-                    🛑 Стереотип #${index + 1}
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold uppercase tracking-wider">
+                    🛑 #${index + 1}
                   </span>
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 text-[10px] font-bold">
                     ${catObj.icon} ${catObj.name.replace(/^[^\s]+\s/, '')}
                   </span>
                 </div>
                 <p class="text-sm font-semibold text-slate-900 leading-relaxed italic">
-                  ${item.anxiety}
+                  ${highlight(item.anxiety, searchQuery)}
                 </p>
               </div>
-              <button onclick="openEditModal('${item.id}')" class="no-print opacity-0 group-hover:opacity-100 text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-indigo-50 transition-all shrink-0" title="Редагувати">
-                <i class="fa-solid fa-pen-to-square text-xs"></i>
-              </button>
+              <div class="no-print flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <button onclick="openEditModal('${item.id}')" class="text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-indigo-50" title="Редагувати">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <button onclick="deleteCase('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50" title="Видалити">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
             </div>
           </td>
-
-          <!-- Column 2: Fear (Yellow Anchor) -->
-          <td class="p-5 align-top border-r border-slate-200/80 bg-amber-50/30">
-            <div class="space-y-2">
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider">
-                🔍 Корінь страху
-              </span>
-              <p class="text-sm text-slate-700 leading-relaxed font-medium">
-                ${item.fear}
-              </p>
+          <td class="p-4 align-top border-r border-slate-200/70 bg-amber-50/25">
+            <div class="space-y-1.5">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider">🔍 Корінь</span>
+              <p class="text-sm text-slate-700 leading-relaxed font-medium">${highlight(item.fear, searchQuery)}</p>
             </div>
           </td>
-
-          <!-- Column 3: Solution (Green Anchor + Cover Sticker) -->
-          <td class="p-5 align-top border-r border-slate-200/80 bg-emerald-50/20 relative">
-            <div class="print-only hidden revealed-box-print space-y-2">
-              <p class="text-sm text-slate-800 leading-relaxed">${item.solution}</p>
+          <td class="p-4 align-top border-r border-slate-200/70 bg-emerald-50/15 relative">
+            <div class="print-only hidden revealed-box-print space-y-1.5">
+              <p class="text-sm text-slate-800 leading-relaxed">${escapeHtml(item.solution)}</p>
             </div>
-            <div class="no-print h-full">
+            <div class="no-print h-full min-h-[90px]">
               ${item.revealedSolution ? `
-                <div class="revealed-box space-y-2">
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
-                    💡 Мова рішень
-                  </span>
-                  <p class="text-sm text-slate-800 leading-relaxed">
-                    ${item.solution}
-                  </p>
+                <div class="revealed-box space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">💡 Рішення</span>
+                    <button onclick="toggleCard('${item.id}','solution')" class="text-[10px] text-slate-400 hover:text-slate-600">сховати</button>
+                  </div>
+                  <p class="text-sm text-slate-800 leading-relaxed">${highlight(item.solution, searchQuery)}</p>
                 </div>
               ` : `
                 <div class="sticker-container h-full">
-                  <button onclick="toggleCard('${item.id}', 'solution')" class="sticker-cover w-full h-full min-h-[100px] rounded-2xl p-4 text-white flex flex-col items-center justify-center text-center gap-2 cursor-pointer">
-                    <span class="text-2xl animate-bounce">💡</span>
-                    <span class="text-xs font-bold tracking-wide uppercase">Відкрити рішення</span>
+                  <button onclick="toggleCard('${item.id}','solution')" class="sticker-cover w-full h-full min-h-[90px] rounded-xl p-3 text-white flex flex-col items-center justify-center text-center gap-1.5 cursor-pointer">
+                    <span class="text-xl animate-bounce">💡</span>
+                    <span class="text-[11px] font-bold tracking-wide uppercase">Відкрити рішення</span>
                   </button>
                 </div>
               `}
             </div>
           </td>
-
-          <!-- Column 4: Tool (Teal Anchor + Cover Sticker) -->
-          <td class="p-5 align-top bg-teal-50/20 relative">
-            <div class="print-only hidden revealed-box-print space-y-2">
-              <p class="text-sm text-slate-800 leading-relaxed">${item.tool}</p>
+          <td class="p-4 align-top bg-teal-50/15 relative">
+            <div class="print-only hidden revealed-box-print space-y-1.5">
+              <p class="text-sm text-slate-800 leading-relaxed">${escapeHtml(item.tool)}</p>
             </div>
-            <div class="no-print h-full">
+            <div class="no-print h-full min-h-[90px]">
               ${item.revealedTool ? `
-                <div class="revealed-box space-y-2">
-                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold uppercase tracking-wider">
-                    🔑 Інструмент
-                  </span>
-                  <p class="text-sm font-semibold text-slate-800 leading-relaxed">
-                    ${item.tool}
-                  </p>
+                <div class="revealed-box space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold uppercase tracking-wider">🔑 Інструмент</span>
+                    <button onclick="toggleCard('${item.id}','tool')" class="text-[10px] text-slate-400 hover:text-slate-600">сховати</button>
+                  </div>
+                  <p class="text-sm font-semibold text-slate-800 leading-relaxed">${highlight(item.tool, searchQuery)}</p>
                 </div>
               ` : `
                 <div class="sticker-container h-full">
-                  <button onclick="toggleCard('${item.id}', 'tool')" class="sticker-cover w-full h-full min-h-[100px] rounded-2xl p-4 text-white flex flex-col items-center justify-center text-center gap-2 cursor-pointer">
-                    <span class="text-2xl animate-pulse">🔑</span>
-                    <span class="text-xs font-bold tracking-wide uppercase">Відкрити інструмент</span>
+                  <button onclick="toggleCard('${item.id}','tool')" class="sticker-cover w-full h-full min-h-[90px] rounded-xl p-3 text-white flex flex-col items-center justify-center text-center gap-1.5 cursor-pointer">
+                    <span class="text-xl animate-pulse">🔑</span>
+                    <span class="text-[11px] font-bold tracking-wide uppercase">Відкрити інструмент</span>
                   </button>
                 </div>
               `}
             </div>
           </td>
         `;
-
         tbody.appendChild(tr);
       });
     }
 
-    // Interactive Card Toggle
+    function renderMobileCards(filtered) {
+      const container = document.getElementById('mobileCards');
+      container.innerHTML = '';
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="bg-white/90 rounded-2xl p-8 text-center text-slate-500 text-sm border border-slate-200/80">
+            <div class="text-3xl mb-2">🔍</div>
+            Кейсів не знайдено. Змініть фільтр або додайте новий.
+          </div>`;
+        return;
+      }
+
+      filtered.forEach((item, index) => {
+        const catObj = categories[item.category] || { name: 'Загальне', icon: '📌' };
+        const card = document.createElement('div');
+        card.className = 'case-card bg-white/90 rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden';
+
+        card.innerHTML = `
+          <div class="p-4 bg-rose-50/40 border-b border-slate-100">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold uppercase">🛑 #${index + 1}</span>
+                <span class="px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 text-[10px] font-bold">${catObj.icon} ${catObj.name.replace(/^[^\s]+\s/, '')}</span>
+              </div>
+              <div class="flex gap-1">
+                <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                <button onclick="deleteCase('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50"><i class="fa-solid fa-trash-can text-xs"></i></button>
+              </div>
+            </div>
+            <p class="text-sm font-semibold text-slate-900 italic leading-relaxed">${highlight(item.anxiety, searchQuery)}</p>
+          </div>
+          <div class="p-4 bg-amber-50/30 border-b border-slate-100">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold uppercase mb-1.5">🔍 Корінь страху</span>
+            <p class="text-sm text-slate-700 leading-relaxed">${highlight(item.fear, searchQuery)}</p>
+          </div>
+          <div class="p-4 bg-emerald-50/20 border-b border-slate-100">
+            ${item.revealedSolution ? `
+              <div class="revealed-box">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">💡 Мова рішень</span>
+                  <button onclick="toggleCard('${item.id}','solution')" class="text-[10px] text-slate-400">сховати</button>
+                </div>
+                <p class="text-sm text-slate-800 leading-relaxed">${highlight(item.solution, searchQuery)}</p>
+              </div>
+            ` : `
+              <button onclick="toggleCard('${item.id}','solution')" class="sticker-cover w-full rounded-xl py-4 text-white flex flex-col items-center gap-1">
+                <span class="text-lg">💡</span>
+                <span class="text-[11px] font-bold uppercase">Відкрити рішення</span>
+              </button>
+            `}
+          </div>
+          <div class="p-4 bg-teal-50/20">
+            ${item.revealedTool ? `
+              <div class="revealed-box">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold uppercase">🔑 Інструмент</span>
+                  <button onclick="toggleCard('${item.id}','tool')" class="text-[10px] text-slate-400">сховати</button>
+                </div>
+                <p class="text-sm font-semibold text-slate-800 leading-relaxed">${highlight(item.tool, searchQuery)}</p>
+              </div>
+            ` : `
+              <button onclick="toggleCard('${item.id}','tool')" class="sticker-cover w-full rounded-xl py-4 text-white flex flex-col items-center gap-1">
+                <span class="text-lg">🔑</span>
+                <span class="text-[11px] font-bold uppercase">Відкрити інструмент</span>
+              </button>
+            `}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     function toggleCard(id, field) {
-      const targetCase = cases.find(c => c.id === id);
-      if (targetCase) {
-        if (field === 'solution') targetCase.revealedSolution = !targetCase.revealedSolution;
-        if (field === 'tool') targetCase.revealedTool = !targetCase.revealedTool;
-        renderTable();
+      const target = cases.find(c => c.id === id);
+      if (!target) return;
+      if (field === 'solution') target.revealedSolution = !target.revealedSolution;
+      if (field === 'tool') target.revealedTool = !target.revealedTool;
+      saveToStorage();
+      renderAll();
+    }
+
+    function updateGlobalBtn() {
+      const allRevealed = cases.length > 0 && cases.every(c => c.revealedSolution && c.revealedTool);
+      const btnText = document.getElementById('globalRevealText');
+      const btnIcon = document.getElementById('globalRevealIcon');
+      if (allRevealed) {
+        btnText.textContent = 'Приховати всі';
+        btnIcon.className = 'fa-solid fa-eye-slash';
+      } else {
+        btnText.textContent = 'Відкрити всі';
+        btnIcon.className = 'fa-solid fa-eye';
       }
     }
 
-    // Global Reveal Toggle
     function toggleAllStickers() {
       const allRevealed = cases.every(c => c.revealedSolution && c.revealedTool);
       cases.forEach(c => {
         c.revealedSolution = !allRevealed;
         c.revealedTool = !allRevealed;
       });
-
-      const btnText = document.getElementById('globalRevealText');
-      const btnIcon = document.getElementById('globalRevealIcon');
-
-      if (!allRevealed) {
-        btnText.textContent = 'Приховати всі рішення';
-        btnIcon.className = 'fa-solid fa-eye-slash';
-      } else {
-        btnText.textContent = 'Відкрити всі рішення';
-        btnIcon.className = 'fa-solid fa-eye';
-      }
-
-      renderTable();
+      saveToStorage();
+      renderAll();
+      showToast(allRevealed ? 'Рішення приховано' : 'Усі рішення відкрито');
     }
 
-    // Case Modal Logic
     function openEditModal(id) {
-      const targetCase = cases.find(c => c.id === id);
-      if (!targetCase) return;
-
+      const target = cases.find(c => c.id === id);
+      if (!target) return;
       document.getElementById('caseModalTitle').textContent = 'Редагувати кейс';
-      document.getElementById('caseId').value = targetCase.id;
-      document.getElementById('fieldCategory').value = targetCase.category || 'art';
-      document.getElementById('fieldAnxiety').value = targetCase.anxiety;
-      document.getElementById('fieldFear').value = targetCase.fear;
-      document.getElementById('fieldSolution').value = targetCase.solution;
-      document.getElementById('fieldTool').value = targetCase.tool;
-
+      document.getElementById('caseId').value = target.id;
+      document.getElementById('fieldCategory').value = target.category || 'art';
+      document.getElementById('fieldAnxiety').value = target.anxiety;
+      document.getElementById('fieldFear').value = target.fear;
+      document.getElementById('fieldSolution').value = target.solution;
+      document.getElementById('fieldTool').value = target.tool;
       document.getElementById('caseModal').classList.remove('hidden');
     }
 
@@ -769,14 +821,14 @@
       document.getElementById('caseModal').classList.add('hidden');
     }
 
-    function saveCase(event) {
-      event.preventDefault();
+    function saveCase(e) {
+      e.preventDefault();
       const id = document.getElementById('caseId').value;
       const category = document.getElementById('fieldCategory').value;
-      const anxiety = document.getElementById('fieldAnxiety').value;
-      const fear = document.getElementById('fieldFear').value;
-      const solution = document.getElementById('fieldSolution').value;
-      const tool = document.getElementById('fieldTool').value;
+      const anxiety = document.getElementById('fieldAnxiety').value.trim();
+      const fear = document.getElementById('fieldFear').value.trim();
+      const solution = document.getElementById('fieldSolution').value.trim();
+      const tool = document.getElementById('fieldTool').value.trim();
 
       if (id) {
         const item = cases.find(c => c.id === id);
@@ -787,24 +839,41 @@
           item.solution = solution;
           item.tool = tool;
         }
+        showToast('Кейс оновлено');
       } else {
         cases.push({
           id: 'case-' + Date.now(),
-          category,
-          anxiety,
-          fear,
-          solution,
-          tool,
+          category, anxiety, fear, solution, tool,
           revealedSolution: false,
           revealedTool: false
         });
+        showToast('Новий кейс додано');
       }
-
+      saveToStorage();
       closeCaseModal();
-      renderTable();
+      renderAll();
     }
 
-    // Gallery Modal Logic
+    function deleteCase(id) {
+      if (!confirm('Видалити цей кейс?')) return;
+      cases = cases.filter(c => c.id !== id);
+      saveToStorage();
+      renderAll();
+      showToast('Кейс видалено');
+    }
+
+    function exportCases() {
+      const data = JSON.stringify(cases, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'anxiety-to-solution-cases.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Експортовано JSON');
+    }
+
     function openGalleryModal() {
       document.getElementById('galleryModal').classList.remove('hidden');
       updateSlide();
@@ -816,18 +885,22 @@
 
     function updateSlide() {
       const item = galleryItems[currentSlide];
-      document.getElementById('galleryImage').src = item.img;
+      const img = document.getElementById('galleryImage');
+      img.style.opacity = '0.4';
+      img.onload = () => { img.style.opacity = '1'; };
+      img.src = item.img;
       document.getElementById('galleryBadge').textContent = item.badge;
       document.getElementById('galleryTitle').textContent = item.title;
       document.getElementById('galleryDesc').textContent = item.desc;
       document.getElementById('galleryCounter').textContent = `${currentSlide + 1} / ${galleryItems.length}`;
 
-      const dotsContainer = document.getElementById('galleryDots');
-      dotsContainer.innerHTML = '';
+      const dots = document.getElementById('galleryDots');
+      dots.innerHTML = '';
       galleryItems.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = `h-2 rounded-full transition-all ${i === currentSlide ? 'bg-indigo-600 w-6' : 'bg-slate-300 w-2'}`;
-        dotsContainer.appendChild(dot);
+        const dot = document.createElement('button');
+        dot.className = `h-2 rounded-full transition-all ${i === currentSlide ? 'bg-indigo-600 w-5' : 'bg-slate-300 w-2'}`;
+        dot.onclick = () => { currentSlide = i; updateSlide(); };
+        dots.appendChild(dot);
       });
     }
 
@@ -842,17 +915,30 @@
     }
 
     document.addEventListener('keydown', (e) => {
-      const galleryModal = document.getElementById('galleryModal');
-      if (!galleryModal.classList.contains('hidden')) {
+      const gallery = document.getElementById('galleryModal');
+      const caseM = document.getElementById('caseModal');
+      if (!gallery.classList.contains('hidden')) {
         if (e.key === 'ArrowRight') nextSlide();
         if (e.key === 'ArrowLeft') prevSlide();
         if (e.key === 'Escape') closeGalleryModal();
       }
+      if (!caseM.classList.contains('hidden') && e.key === 'Escape') closeCaseModal();
+    });
+
+    // Close modals on backdrop click
+    ['galleryModal', 'caseModal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', (e) => {
+        if (e.target.id === id) {
+          if (id === 'galleryModal') closeGalleryModal();
+          else closeCaseModal();
+        }
+      });
     });
 
     window.onload = function() {
+      loadCases();
       renderCategoryFilters();
-      renderTable();
+      renderAll();
     };
   </script>
 </body>
